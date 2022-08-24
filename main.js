@@ -93,3 +93,6 @@ setInterval(() => {
     step();
 }, 200);
 
+function dump(obj) {
+    document.getElementById("debug").innerText = JSON.stringify(obj);
+}
