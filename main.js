@@ -44,7 +44,6 @@ function drawSnake(snake) {
     }
 }
 
-
 let currentSnake = [
     [0, 0],
     [0, 1],
@@ -53,28 +52,35 @@ let currentSnake = [
     [0, 4],
 ];
 
-
 let moveRight = ([t, l]) => [t, l + 1];
 let moveLeft = ([t, l]) => [t, l - 1];
-let moveTop = ([t, l]) => [t - 1, l];
-let moveBottom = ([t, l]) => [t + 1, l];
+let moveUp = ([t, l]) => [t - 1, l];
+let moveDown = ([t, l]) => [t + 1, l];
 
 let currentDirection = moveRight;
-let flushedDirection = currentDirection;
+let directionQueue = [];
 
 window.addEventListener("keydown", (e) => {
     switch (e.key) {
         case 'ArrowLeft':
-            if (flushedDirection !== moveRight) { currentDirection = moveLeft; }
+        case 'a':
+        case 'A':
+            directionQueue.push(moveLeft);
             break;
         case 'ArrowRight':
-            if (flushedDirection !== moveLeft) { currentDirection = moveRight; }
+        case 'd':
+        case 'D':
+            directionQueue.push(moveRight);
             break;
         case "ArrowUp":
-            if (flushedDirection !== moveBottom) { currentDirection = moveTop; }
+        case 'w':
+        case 'W':
+            directionQueue.push(moveUp);
             break;
         case "ArrowDown":
-            if (flushedDirection !== moveTop) { currentDirection = moveBottom }
+        case 's':
+        case 'S':
+            directionQueue.push(moveDown);
             break;
     }
 });
@@ -82,12 +88,39 @@ window.addEventListener("keydown", (e) => {
 function step() {
     currentSnake.shift();
     let head = currentSnake[currentSnake.length - 1];
+    let nextDirection = currentDirection;
+
+    while(directionQueue.length > 0){
+
+        let candidateDirection = directionQueue.shift();
+        if (areOpposite(candidateDirection, currentDirection)) {
+            continue;
+        }
+        nextDirection = candidateDirection;
+        break;
+    }
+
+    currentDirection = nextDirection;
     let nextHead = currentDirection(head);
-    flushedDirection = currentDirection;
     currentSnake.push(nextHead);
     drawSnake(currentSnake);
 }
 
+function areOpposite(dir1, dir2) {
+    if (dir1 === moveLeft && dir2 === moveRight){
+        return true;
+    }
+    if (dir1 === moveRight && dir2 === moveLeft){
+        return true;
+    }
+    if (dir1 === moveUp && dir2 === moveDown){
+        return true;
+    }
+    if (dir1 === moveDown && dir2 === moveUp){
+        return true;
+    }
+    return false;
+}
 drawSnake(currentSnake);
 setInterval(() => {
     step();
